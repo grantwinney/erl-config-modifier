@@ -9,7 +9,7 @@ read_terms(FileName) ->
 		{error, {_Line, _Mod, _Term} = Reason} ->
 			{error, file:format_error(Reason)};
 		{error, Reason} ->
-			{error, display_error_message(Reason, FileName)}
+			{error, error_message(Reason, FileName)}
 	end.
 
 get_nested_terms(Keys, Terms) ->
@@ -26,15 +26,15 @@ write_terms(Filename, Terms) ->
     file:write_file(Filename, lists:map(Format, [Terms])).
 
 
-display_error_message(enoent, FileName) ->
+error_message(enoent, FileName) ->
 	io_lib:format("The file does not exist: ~p", [FileName]);
-display_error_message(eaccess, FileName) ->
+error_message(eaccess, FileName) ->
 	io_lib:format("Missing permission for reading the file, or for searching one of the parent directories: ~p", [FileName]);
-display_error_message(eisdir, FileName) ->
+error_message(eisdir, FileName) ->
 	io_lib:format("The named file is a directory: ~p", [FileName]);
-display_error_message(enotdir, FileName) ->
+error_message(enotdir, FileName) ->
 	io_lib:format("A component of the filename is not a directory: ~p", [FileName]);
-display_error_message(enomem, _FileName) ->
+error_message(enomem, _FileName) ->
 	io_lib:format("There is not enough memory for the contents of the file.");
-display_error_message(Error, FileName) ->
+error_message(Error, FileName) ->
 	io_lib:format("~p error: ~p", [Error, FileName]).
