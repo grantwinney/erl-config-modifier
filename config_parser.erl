@@ -1,3 +1,6 @@
+% Author: Grant Winney
+% License: MIT
+
 -module(config_parser).
 
 -export([read_terms/1, get_nested_terms/2, set_nested_terms/3, write_terms/2]).
@@ -12,6 +15,10 @@ read_terms(FileName) ->
             {error, error_message(Reason, FileName)}
     end.
 
+write_terms(FileName, Terms) ->
+    Format = fun(Term) -> io_lib:format("~tp.~n", [Term]) end,
+    file:write_file(FileName, lists:map(Format, [Terms])).
+
 get_nested_terms(Keys, Terms) ->
     lists:foldl(fun(Key, InnerTerms) -> proplists:get_value(Key, InnerTerms) end, Terms, Keys).
 
@@ -20,10 +27,6 @@ set_nested_terms([Key], ReplacementTerms, Terms) ->
 set_nested_terms([Key|NestedKeys], ReplacementTerms, Terms) ->
     InnerValue = set_nested_terms(NestedKeys, ReplacementTerms, proplists:get_value(Key, Terms)),
     lists:keyreplace(Key, 1, Terms, {Key, InnerValue}).
-
-write_terms(Filename, Terms) ->
-    Format = fun(Term) -> io_lib:format("~p.~n", [Term]) end,
-    file:write_file(Filename, lists:map(Format, [Terms])).
 
 
 error_message(enoent, FileName) ->
